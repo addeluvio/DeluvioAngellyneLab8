@@ -1,0 +1,55 @@
+{
+  "project_info": {
+    "project_number": "1024320844954",
+    "firebase_url": "https://deluvioangellynelab8.firebaseio.com",
+    "project_id": "deluvioangellynelab8",
+    "storage_bucket": "deluvioangellynelab8.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1024320844954:android:5dc685b0c045d883",
+        "android_client_info": {
+          "package_name": "com.deluvio.angellyne"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1024320844954-8r7t2pb6q0k6ovtv5f5s8tondf4su976.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.deluvio.angellyne",
+            "certificate_hash": "65cf1a8bc6fe4ff8b38adc17d91fe089a0c12555"
+          }
+        },
+        {
+          "client_id": "1024320844954-m9uqk45eftm96gdia9vok3rcn652o2q5.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAg-biSYv9aBdCvNrzgpZbkkXYsfBSYqko"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1024320844954-m9uqk45eftm96gdia9vok3rcn652o2q5.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
