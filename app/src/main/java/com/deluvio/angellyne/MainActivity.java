@@ -1,86 +1,140 @@
 package com.deluvio.angellyne;
 
-import android.support.annotation.NonNull;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
-
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
+import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity {
+
     FirebaseDatabase db;
-    DatabaseReference root;
-
-
-    private EditText fullName;
-    private EditText age;
-    private EditText gender;
-
-    private String saveCurrentDate = "";
-    private String saveCurrentTime = "";
-    private String uniqueId = "";
+    DatabaseReference points;
+    EditText etFname, etage, etgender;
+    TextView tvFname,tvage,tvgender;
+    ArrayList<String> keyList;
+    int index;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        //super.onCreate(savedInstanceState);
-        //setContentView(R.layout.activity_main);
         db = FirebaseDatabase.getInstance();
-        root = db.getReference("Users");
-        fullName = findViewById(R.id.fullname);
-        age = findViewById(R.id.age);
-        gender = findViewById(R.id.gender);
-//        keylist = new ArrayList<>();
-//        init();
+        points = db.getReference("points");
+        etFname = findViewById(R.id.etFname);
+        etage = findViewById(R.id.etage);
+        etgender = findViewById(R.id.etgender);
+        tvFname = findViewById(R.id.tvFname);
+        tvage = findViewById(R.id.tvage);
+        tvgender = findViewById(R.id.tvgender);
+
+        keyList = new ArrayList<>();
     }
 
-    public void saveData(EditText fullName, EditText age, EditText gender) {
-
-        Calendar calendarDate = Calendar.getInstance();
-        SimpleDateFormat currentDate = new SimpleDateFormat("MMMM:dd:yyyy");
-        saveCurrentDate = currentDate.format(calendarDate.getTime());
-
-        Calendar calendarTime = Calendar.getInstance();
-        SimpleDateFormat currentTime = new SimpleDateFormat("HH:mm:ss:SSS");
-        saveCurrentTime = currentTime.format(calendarTime.getTime());
-
-        uniqueId = saveCurrentDate.concat(saveCurrentTime);
-
-        String getFullName = fullName.getText().toString().trim();
-        String getAge = age.getText().toString().trim();
-        String getGender = gender.getText().toString().trim();
-
-        User user = new User(getFullName, getAge, getGender);
-
-        root.child(uniqueId).setValue(user).addOnCompleteListener(new OnCompleteListener<Void>() {
+    @Override
+    protected void onStart() {
+        super.onStart();
+        points.addValueEventListener(new ValueEventListener() {
             @Override
-            public void onComplete(@NonNull Task<Void> task) {
-                if (task.isSuccessful()){
-                    Toast.makeText(MainActivity.this, "saving is Successful!", Toast.LENGTH_LONG).show();
-                }else{
-                    Toast.makeText(MainActivity.this,task.getException().getMessage(), Toast.LENGTH_LONG).show();
-
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                for(DataSnapshot ss : dataSnapshot.getChildren()){
+                    keyList.add(ss.getKey());
                 }
+//                Toast.makeText(MainActivity.this,dataSnapshot.child( keyList.get(0)).child("fullName").getValue().toString(), Toast.LENGTH_LONG).show();
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+    }
+
+    public void addRecord (View v){
+
+
+
+        points.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                String fname = etFname.getText().toString().trim();
+                Boolean flag = false;
+                for (String ss : keyList) {
+//                    Person user = dataSnapshot.child(ss).child().getValue(Person.class);
+                    String ffname = dataSnapshot.child(ss).child("fullName").getValue().toString();
+
+
+                    if(ffname.equals(etFname.getText().toString().trim())){
+                        flag =true;
+//                        tvFname.setText(dataSnapshot.child(ss).child("fullName").getValue().toString());
+//                        tvgender.setText(dataSnapshot.child(ss).child("gender").getValue().toString());
+//                        tvage.setText(dataSnapshot.child(ss).child("age").getValue().toString());
+                    }
+                }
+                if(!flag){
+
+                    String gender = etgender.getText().toString().trim();
+                    Integer age = Integer.parseInt(etage.getText().toString().trim());
+                    String key = points.push().getKey();
+                    Person person = new Person(fname, gender, age);
+                    points.child(key).setValue(person);
+                    keyList.add(key);
+                    Toast.makeText(MainActivity.this, "Successfully added to db", Toast.LENGTH_LONG).show();
+                }
+                else{
+                    Toast.makeText(MainActivity.this, "Fullname already on DB", Toast.LENGTH_LONG).show();
+                }
+
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
 
             }
         });
 
 
+//        Toast.makeText(this, "Record Inserted...", Toast.LENGTH_LONG).show();
+
     }
 
-    public void option (View v){
-        if (v.getId() == R.id.Save){
-            saveData(fullName, age, gender);
-        }
+
+    public void search(View v){
+        String fname = etFname.getText().toString().trim();
+        points.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                for (String ss : keyList) {
+//                    Person user = dataSnapshot.child(ss).child().getValue(Person.class);
+                    String fname = dataSnapshot.child(ss).child("fullName").getValue().toString();
+
+//                    Toast.makeText(MainActivity.this, fname, Toast.LENGTH_LONG).show();
+                    if(fname.equals(etFname.getText().toString().trim())){
+                        tvFname.setText(dataSnapshot.child(ss).child("fullName").getValue().toString());
+                        tvgender.setText(dataSnapshot.child(ss).child("gender").getValue().toString());
+                        tvage.setText(dataSnapshot.child(ss).child("age").getValue().toString());
+                    }
+                }
+
+
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
     }
+
+
+
 }
